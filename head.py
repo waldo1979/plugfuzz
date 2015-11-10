@@ -54,6 +54,23 @@ class mark_loaded():
         
         return counter
 
+class mark_hung():
+    def GET(self, testnum):
+        global lock
+        try:
+            lock.acquire(True)
+            #cur = conn.cursor()
+            cur.execute("SELECT count(id) FROM testcases WHERE id = ?", (testnum,))
+            row = cur.fetchone()
+            if (row is not None):
+                cur.execute("UPDATE testcases SET result = 3 WHERE id = ?", (testnum,))
+                conn.commit()
+        finally:
+            lock.release()
+        
+        return counter
+
+
 class get_status():
     def GET(self, testnum):
         global lock
@@ -77,6 +94,7 @@ urls = (
     "/getnextid", "get_nextid",
     "/test/(\d+)/payload", "get_payload",
     "/test/(\d+)/loaded", "mark_loaded",
+    "/test/(\d+)/hunt", "mark_hung",
     "/test/(\d+)/status", "get_status"
     #"/test/(\d+)/record_crash","record_crash"
 )
