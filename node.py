@@ -17,9 +17,9 @@ attempts = 0
 def m_conmsg(message, indent):
     sys.stdout.write("  "* indent) 
     if indent > 0:
-        sys.stdout.write("- "+message+"... ")
+        sys.stdout.write("- %s... " % message)
     else:
-        sys.stdout.write("[*] "+message+"... ")
+        sys.stdout.write("[*] %s... " % message)
 
 def get_nextid():
     global last_testid
@@ -28,6 +28,11 @@ def get_nextid():
     last_testid = r.text
     print last_testid
 
+def mark_hung(testid):
+    m_conmsg("Logging hung test", 1)
+    r = request.get("http://localhost:8081/test/%s/hung")
+    print "DONE"
+
 def not_loaded(testid):
     global attempts
     m_conmsg("Checking page loaded", 1)
@@ -35,7 +40,7 @@ def not_loaded(testid):
     response = r.text
     if attempts == 3:
         print "FAILED TO LOAD"
-        # TODO LOG FAILURE
+        mark_hung(testid)        
         attempts = 0
         return False
     elif response == "0":
@@ -50,20 +55,20 @@ def not_loaded(testid):
         attempts = 0
         print "LOADED"
         return False
+    elif response == "3":
+        attempt = 0
+        print "HUNG"
+        return False
     else:
         print "EPIC FAILURE"
         return True
-
 
 def test_loop():
     start_safari()
     while(1):
         load_test()
 
-
 def start_safari():
-    ## TODO
-    # Set Heap Debugging environmental variables
     debug = pydbg()
     m_conmsg("Starting Safari",0)
     safari_process = subprocess.Popen(['/Applications/Safari.app/Contents/MacOS/SafariForWebKitDevelopment', ''], env=dict(os.environ, DYLD_INSERT_LIBRARIES="/usr/lib/libgmalloc.dylib"), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -77,7 +82,7 @@ def start_safari():
 def load_test():
     get_nextid()
     current_id = last_testid
-    m_ascript('tell application "Safari" to set the URL of the front document to "http://localhost:8081/test/' + str(current_id) + '/payload"')
+    m_ascript('tell application "Safari" to set the URL of the front document to "http://localhost:8081/test/%s/payload"' % current_id)
     while(not_loaded(current_id)):
         time.sleep(1)
 
