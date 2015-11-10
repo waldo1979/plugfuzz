@@ -31,9 +31,6 @@ def get_nextid():
 def not_loaded(testid):
     global attempts
     m_conmsg("Checking page loaded", 1)
-    #connection = httplib.HTTPConnection("localhost:8081") 
-    #connection.request('GET','/test/'+str(testid)+"/status")
-    #response = connection.getresponse().read()
     r = requests.get("http://localhost:8081/test/%s/status" % testid)
     response = r.text
     if attempts == 3:
@@ -45,15 +42,16 @@ def not_loaded(testid):
         attempts += 1
         print "NOT LOADED"
         return True 
+    elif response == "-1":     
+        attempts += 1
+        print "NOT LOADED"
+        return True 
     elif response == "1":
         attempts = 0
         print "LOADED"
         return False
-    elif response == "-1":     
-        print "NOT LOADED"
-        return True
     else:
-        print "FAILURE"
+        print "EPIC FAILURE"
         return True
 
 
