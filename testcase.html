@@ -1,0 +1,19 @@
+$def with (testnum,payload)
+<html>
+<head>
+<script language="Javascript">
+function loaded()
+{
+	var url = "http://localhost:8081/test/$testnum/loaded";
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", url, false);
+	xhr.send();
+
+	//window.location.href = "/test/" + xhr.responseText + "/payload";
+}
+</script>
+</head>
+<body onLoad="loaded()">
+$payload
+</body>
+</html>
