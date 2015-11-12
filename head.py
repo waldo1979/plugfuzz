@@ -4,6 +4,8 @@ import web
 import sqlite3
 import threading
 
+from fuzz import Fuzzer 
+
 ####################
 # RESULTS IDENTIFIER
 # 0 = not loaded
@@ -28,11 +30,11 @@ class get_payload():
         global counter
         global lock
         testcase_tmpl = web.template.frender("testcase.html")
-        counter+=1
-        payload="BLAH"
         try:
             lock.acquire(True)
-            cur.execute("INSERT INTO testcases (id,result,payload) VALUES (?,?,?)", (testnum,str(0), payload))
+            payload = Fuzzer.Instance().get_next()
+            cur.execute("INSERT INTO testcases (id,result,payload) VALUES (?,?,?)", (testnum,str(0), buffer(payload)))
+            counter+=1
         finally:
             lock.release()
 
@@ -107,7 +109,7 @@ def db_setup():
     cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='testcases';")
     row = cur.fetchone()
     if (row is None):
-        cur.execute("CREATE TABLE testcases (id int, result int, payload text)")
+        cur.execute("CREATE TABLE testcases (id int, result int, payload blob)")
         conn.commit()
     else:
         pass
