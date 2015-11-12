@@ -30,7 +30,7 @@ def get_nextid():
 
 def mark_hung(testid):
     m_conmsg("Logging hung test", 1)
-    r = request.get("http://localhost:8081/test/%s/hung")
+    r = requests.get("http://localhost:8081/test/%s/hung")
     print "DONE"
 
 def not_loaded(testid):
