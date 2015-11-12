@@ -30,15 +30,17 @@ class get_payload():
         global counter
         global lock
         testcase_tmpl = web.template.frender("testcase.html")
+        payload_top = str(testcase_tmpl(testnum))
+        payload_bottom = "\n</body></html>"
         try:
             lock.acquire(True)
-            payload = Fuzzer.Instance().get_next()
-            cur.execute("INSERT INTO testcases (id,result,payload) VALUES (?,?,?)", (testnum,str(0), buffer(payload)))
+            payload_body = Fuzzer.Instance().get_next()
+            cur.execute("INSERT INTO testcases (id,result,payload) VALUES (?,?,?)", (testnum,str(0), buffer(payload_body)))
             counter+=1
         finally:
             lock.release()
 
-        return testcase_tmpl(testnum,payload)
+        return (payload_top + payload_body + payload_bottom)
 
 class mark_loaded():
     def GET(self, testnum):
