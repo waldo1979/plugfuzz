@@ -74,7 +74,7 @@ def start_safari():
     safari_process = subprocess.Popen(['/Applications/Safari.app/Contents/MacOS/SafariForWebKitDevelopment', ''], env=dict(os.environ, DYLD_INSERT_LIBRARIES="/usr/lib/libgmalloc.dylib"), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     debug.attach(safari_process.pid)
     print "DONE"
-    time.sleep(1)
+    time.sleep(0.6)
     m_ascript('tell application "Safari" to close every window') 
     m_ascript('tell application "Safari" to open location "about:blank"') 
 
@@ -83,6 +83,7 @@ def load_test():
     get_nextid()
     current_id = last_testid
     m_ascript('tell application "Safari" to set the URL of the front document to "http://localhost:8081/test/%s/payload"' % current_id)
+    time.sleep(0.1)
     while(not_loaded(current_id)):
         time.sleep(1)
 
